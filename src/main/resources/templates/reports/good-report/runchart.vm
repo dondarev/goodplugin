@@ -109,7 +109,7 @@
         </div>
     </div>
     <button id="sendRequest">Сhoose period</button>
-    <script type="text/javascript">
+    <script type="text/javascript" >
         var canvas = document.getElementById('canvas');
         var botton = document.getElementById("sendRequest");
         var request = new XMLHttpRequest();

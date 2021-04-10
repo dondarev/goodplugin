@@ -14,7 +14,8 @@
   <web-resource key="goodplugin-resources" name="goodplugin Web Resources"> 
     <dependency>com.atlassian.auiplugin:ajs</dependency>  
     <resource type="download" name="goodplugin.css" location="/css/goodplugin.css"/>  
-    <resource type="download" name="goodplugin.js" location="/js/goodplugin.js"/>  
+    <resource type="download" name="goodplugin.js" location="/js/goodplugin.js"/>
+    <resource type="download" name="polzunok.js" location="/js/polzunok.js"/>
     <resource type="download" name="images/" location="/images"/>  
     <context>goodplugin</context> 
   </web-resource>
