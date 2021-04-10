@@ -1,0 +1,212 @@
+<div style="padding: 5px">
+    <!-- Display the report configuration -->
+    <h4 id="creation-report-parameters">
+        $i18n.getText('report.issuecreation.project'): $projectName |
+        $i18n.getText('report.issuecreation.duration'):$startDate - $endDate |
+        $i18n.getText('report.issuecreation.interval'): $interval$i18n.getText('report.issuecreation.interval.days')
+    </h4>
+    <br/>
+
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <button id="change-chart">Change to Classic</button>
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawStuff);
+
+            function drawStuff() {
+                var button = document.getElementById('change-chart');
+                var chartDiv = document.getElementById('oil');
+
+
+               /* data.addColumn('string', 'Tickets Deployed(one ticket per vertical line)');
+                data.addColumn('number', 'Lead Time (days)');*/
+
+                var periodIssueLivesVar = [];
+                #foreach($periodIssueLive in $periodIssueLives)
+                    periodIssueLivesVar.push($periodIssueLive);
+                #end
+                var dates = [];
+                #foreach ($date in $dates)
+                    dates.push('$date');
+                #end
+                var doubleMAs = [
+                    ['','']
+                ];
+                for (var i = 0; i < periodIssueLivesVar.length; i++) {
+                    var m = [];
+                    m.push(dates[i]);
+                    m.push(periodIssueLivesVar[i]);
+                    doubleMAs.push(m)
+                }
+                var data = google.visualization.arrayToDataTable(doubleMAs);
+
+                var scatterOptions = {
+
+                    width: 1000,
+                    height: 500,
+                    hAxis: {title: 'Tickets Deployed(one ticket per vertical line)', minValue: 0},
+                    vAxis: {title: 'Lead Time (days)', minValue: 0},
+                    legend: 'none',
+                    curveType: 'function',
+                    pointSize: 20,
+                    colors: ['#087037'],
+                    pointShape: 'star',
+                }
+
+                var lineOptions = {
+                    hAxis: {title: 'Tickets Deployed(one ticket per vertical line)', minValue: 0},
+                    vAxis: {title: 'Lead Time (days)', minValue: 0},
+                    width: 1000,
+                    height: 500,
+                    legend: 'none',
+                    colors: ['#087037'],
+                    pointSize: 20,
+                    pointShape: { type: 'star', sides: 4 }
+                }
+
+                function drawScatterChart() {
+                    var materialChart = new google.visualization.ScatterChart(chartDiv);
+                    materialChart.draw(data, scatterOptions);
+                    button.innerText = 'Change to Line';
+                    button.onclick = drawLineChart;
+                }
+
+                function drawLineChart() {
+                    var classicChart = new google.visualization.LineChart(chartDiv);
+                    classicChart.draw(data, lineOptions);
+                    button.innerText = 'Change to Scatter';
+                    button.onclick = drawScatterChart;
+                }
+                drawScatterChart();
+
+            }
+        </script>
+    </head>
+    <div id="oil" style="width: 1100px; height: 600px;"></div>
+
+</div>
+
+
+</div>
+<h4 style="display: block;">Overview</h4>
+<p class="ghx-description" style="display: block;">Click and drag along the chart or view charts to select a date range (double-clicking on the overview clears the selection).</p>
+<div id="ghx-chart-overview" style="padding: 0px; position: relative;">
+    <canvas id="canvas" width="730" height="100"></canvas>
+    <div class="tickLabels" style="font-size:smaller">
+        <div class="xAxis x1Axis" style="color:#545454">
+            <div class="tickLabel" style="position:absolute;text-align:center;left:0px;top:90px;width:79px">Jan 2020
+            </div>
+            <div class="tickLabel" style="position:absolute;text-align:center;left:183px;top:90px;width:67px">Jul 2020
+            </div>
+            <div class="tickLabel" style="position:absolute;text-align:center;left:366px;top:90px;width:67px">Jan 2021
+            </div>
+            <div class="tickLabel" style="position:absolute;text-align:center;left:549px;top:90px;width:67px">Jul 2021
+            </div>
+            <div class="tickLabel" style="position:absolute;text-align:center;left:680px;top:90px;width:67px">Jan 2022
+            </div>
+        </div>
+    </div>
+    <button id="sendRequest">Сhoose period</button>
+    <script type="text/javascript">
+        var canvas = document.getElementById('canvas');
+        var botton = document.getElementById("sendRequest");
+        var request = new XMLHttpRequest();
+        botton.style.display = "none"
+        var width = canvas.width;
+        var height = canvas.height;
+        var ctx = canvas.getContext('2d');
+        let flagDraw = false;
+        var beginRectX =0;
+        var endRectX=0;
+        canvas.onmousedown = startDrawing;
+        canvas.onmouseup = closeDraw;
+        canvas.onmousemove = drawRect;
+        canvas.onmouseout = closeDraw2;
+
+        function drawRect(e) {
+            if (flagDraw) {
+                clearCanvas();
+                ctx.lineWidth = 3;
+                ctx.rect(beginRectX, 0, e.offsetX -beginRectX, height - 18);
+                ctx.stroke();
+            }
+        }
+
+        function closeDraw(e) {
+            flagDraw = false;
+            ctx.closePath();
+            endRectX = e.offsetX;
+            botton.style.display="block";
+        }
+
+        function closeDraw2(e) {
+            flagDraw = false;
+        }
+        function startDrawing(e) {
+            beginRectX = e.offsetX;
+            ctx.beginPath();
+            flagDraw = true;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            draw();
+        }
+
+        function draw() {
+            if (canvas.getContext) {
+                ctx.fillStyle = "orange";
+                ctx.strokeStyle = "grey";
+                ctx.lineWidth = 5;
+                drawScale();
+                ctx.beginPath()
+                ctx.fillRect(0, 0, canvas.width, canvas.height - 18);
+                ctx.rect(2, 2, canvas.width - 5, canvas.height - 18);
+                ctx.strokeStyle = "grey";
+                ctx.lineWidth = 5;
+                ctx.stroke();
+                ctx.fill();
+                ctx.closePath()
+            }
+        }
+
+        function drawScale() {
+            ctx.beginPath();
+            ctx.lineWidth = 2;
+            for (var i = 0; i < 73; i++) {
+                ctx.moveTo(i * 10, height - 17);
+                ctx.lineTo(i * 10, height - 11);
+            }
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function getDataFromPeriod(){
+            var dateBeginRect = new Date(2020,0,1);
+            var dateBegin = new Date(dateBeginRect.getTime()+(beginRectX*24*60*60*1000));
+            var dateEnd = new Date(dateBeginRect.getTime()+(endRectX*24*60*60*1000));
+            var masDate={};
+            masDate.begin = dateBegin.getTime();
+            masDate.end = dateEnd.getTime();
+            return masDate;
+        }
+
+        botton.onclick = function (){
+            var dataFromPeriod = getDataFromPeriod();
+            sednRequest(dataFromPeriod.begin,dataFromPeriod.end)
+
+        }
+
+        function sednRequest(dateOne,dateTwo) {
+            var url = "http://localhost:2990/jira/rest/helloworld/1.0/RunChart?dateOne="+dateOne+"&dateTwo="+dateTwo
+            request.open("GET", url);
+            request.send();
+            setTimeout(location.reload(), 3000);
+        }
+
+
+        setTimeout(draw(), 10);
+    </script>
+</div>

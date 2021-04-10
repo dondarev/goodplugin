@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2"> 
+  <plugin-info> 
+    <description>${project.description}</description>  
+    <version>${project.version}</version>  
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>  
+    <param name="plugin-icon">images/pluginIcon.png</param>  
+    <param name="plugin-logo">images/pluginLogo.png</param> 
+  </plugin-info>  
+  <!-- add our i18n resource -->  
+  <resource type="i18n" name="i18n" location="goodplugin"/>  
+  <!-- add our web resources -->  
+  <web-resource key="goodplugin-resources" name="goodplugin Web Resources"> 
+    <dependency>com.atlassian.auiplugin:ajs</dependency>  
+    <resource type="download" name="goodplugin.css" location="/css/goodplugin.css"/>  
+    <resource type="download" name="goodplugin.js" location="/js/goodplugin.js"/>  
+    <resource type="download" name="images/" location="/images"/>  
+    <context>goodplugin</context> 
+  </web-resource>
+
+  <report name="Run chart" i18n-name-key="run-chart.name" key="run-chart" class="com.deretsandcompany.goodplugin.jira.rest.RunChart">
+    <description key="run-chart.description">The Good Report Plugin</description>  
+    <resource name="runchart" type="velocity" location="/templates/reports/good-report/runchart.vm"/>  
+    <resource name="i18n" type="i18n" location="RunChart"/>  
+    <label key="run-chart.label"/>
+  </report>
+
+
+  <report name="Lead time" i18n-name-key="lead-time.name" key="lead-time" class="com.deretsandcompany.goodplugin.jira.rest.LeadTime">
+    <description key="lead-time.description">The Good Report Plugin</description>
+    <resource name="leadtime" type="velocity" location="/templates/reports/good-report/leadtime.vm"/>  
+    <resource name="i18n" type="i18n" location="LeadTime"/>  
+    <label key="lead-time.label"/>
+
+  </report>
+
+  <rest key="helloWorldRest" path="/helloworld" version="1.0" >
+    <description>Provides hello world services.</description>
+  </rest>
+
+</atlassian-plugin>
